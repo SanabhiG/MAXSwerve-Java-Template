@@ -4,10 +4,16 @@
 
 package frc.robot;
 
+import edu.wpi.first.math.VecBuilder;
+import edu.wpi.first.math.controller.SimpleMotorFeedforward;
+import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
+import edu.wpi.first.math.numbers.N1;
+import edu.wpi.first.math.numbers.N3;
 import edu.wpi.first.math.trajectory.TrapezoidProfile;
 import edu.wpi.first.math.util.Units;
+import edu.wpi.first.math.Matrix;
 
 /**
  * The Constants class provides a convenient place for teams to hold robot-wide
@@ -57,6 +63,10 @@ public final class Constants {
     public static final int kRearRightTurningCanId = 16;
 
     public static final boolean kGyroReversed = false;
+    public static final SimpleMotorFeedforward kDriveFeedForward = null;
+    public static final SimpleMotorFeedforward kTurningFeedForward = null;
+    public static final Pose2d kInitialRedPose = null;
+    public static final Pose2d kInitialBluePose = null;
   }
 
   public static final class ModuleConstants {
@@ -71,6 +81,8 @@ public final class Constants {
     public static final double kWheelCircumferenceMeters = kWheelDiameterMeters * Math.PI;
     // 45 teeth on the wheel's bevel gear, 22 teeth on the first-stage spur gear, 15
     // teeth on the bevel pinion
+
+    public static final double kTurningMotorReduction = 1;  //TUNE THIS
     public static final double kDrivingMotorReduction = (45.0 * 22) / (kDrivingMotorPinionTeeth * 15);
     public static final double kDriveWheelFreeSpeedRps = (kDrivingMotorFreeSpeedRps * kWheelCircumferenceMeters)
         / kDrivingMotorReduction;
@@ -99,4 +111,69 @@ public final class Constants {
   public static final class NeoMotorConstants {
     public static final double kFreeSpeedRpm = 5676;
   }
+
+  public static final class NeoVortexMotorConstants {
+    public static final double kFreeSpeedRpm = 5676; //TUNE THIS
+  }
+
+  public static final class LimelightConstants {
+    public static final Matrix<N3, N1> m_stateStdDevs =
+        VecBuilder.fill(0.15, 0.15, 0.00001); // TODO: needs tuning
+    public static final Matrix<N3, N1> m_visionStdDevs =
+        VecBuilder.fill(0.00001, 0.00001, 999999); // TODO: needs
+    // tuning
+    public static final String kRightLimelightName = "limelight-right";
+    public static final String kLeftLimelightName = "limelight-left";
+    public static final String kBackLimelightName = "limelight-back";
+
+    public static final double kRightCameraHeight = 19.942862; // 0.5065486948 meters
+    public static final double kLeftCameraHeight = 19.942862; // 0.5065486948 meters
+
+    // Parallel to elevator
+    public static final double kRightCameraXOffset = 12.153079; // 0.3086882066 meters
+    public static final double kLeftCameraXOffset = -12.153079; // -0.3086882066 meters
+    public static final double kBackCameraXOffset = 0; // -0.3086882066 meters
+
+    // Perpendicular to elevator
+    public static final double kRightCameraYOffset = 11.940763; // 0.3032953802 meters
+    public static final double kLeftCameraYOffset = 11.940763; // 0.3032953802 meters
+    public static final double kBackCameraYOffset = -3.086657; // -0.3086882066 meters
+
+    public static final double kBackCameraHeight = 38.868062; // TODO
+
+    public static final double kRightMountingPitch = -45;
+    public static final double kLeftMountingPitch = -45;
+
+    public static final double kRightMountingYaw = -24.499987;
+    public static final double kLeftMountingYaw = 180 - 24.499987;
+
+    public static final double kBackMountingPitch = 20; // TODO
+
+    public static final double kBackMountingYaw = 0; // TODO
+
+    public static final double kReefTagHeight = 12;
+    public static final double kProcessorTagHeight = 0; // tune later
+    public static final double kCoralStationTagHeight = 53.25; // tune later
+    public static final int kProcessorPipeline = 0; // TBD
+    public static final int kRightReefBranchPipeline = 1;
+    public static final int kLeftReefBranchPipeline = 2;
+    public static final int kRedPosePipeline = 3; // TBD
+    public static final int kBluePosePipeline = 4; // TBD
+    public static final int kCoralStationPipeline = 5;
+
+    public static final double kCoralStationDistanceThreshold = 0; // TODO: tune
+  }
+
+  public static final class LEDConstants {
+    public static final int kBlinkinPort = 2;
+
+    public static final double kBlue = 0.87;
+    public static final double kGreen = 0.77;
+    public static final double kWhite = 0.93;
+    public static final double kYellow = 0.69;
+    public static final double kHeartbeatRed = -0.25;
+    public static final double kViolet = 0.91;
+    public static final double kOrange = 0.65;
+  }
+
 }

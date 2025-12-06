@@ -5,12 +5,10 @@
 package frc.robot.subsystems;
 
 import com.pathplanner.lib.auto.AutoBuilder;
+import com.pathplanner.lib.config.PIDConstants;
 import com.pathplanner.lib.config.RobotConfig;
-import com.pathplanner.lib.controllers.PPLTVController;
+import com.pathplanner.lib.controllers.PPHolonomicDriveController;
 
-import edu.wpi.first.hal.FRCNetComm.tInstances;
-import edu.wpi.first.hal.FRCNetComm.tResourceType;
-import edu.wpi.first.hal.HAL;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
@@ -68,15 +66,18 @@ public class DriveSubsystem extends SubsystemBase {
     } catch (Exception e) {
         e.printStackTrace();
     }
-    
+
     if (config != null) {
         AutoBuilder.configure(
-            this::getPose,
-            this::resetOdometry,
-            this::getRobotRelativeSpeeds,
-            (speeds, feedforwards) -> driveRobotRelative(speeds),
-            new PPLTVController(0.02),
-            config,
+            this::getPose,                 // Robot pose supplier
+            this::resetOdometry,           // Reset pose
+            this::getRobotRelativeSpeeds,  // MUST be robot-relative chassis speeds
+            (speeds, feedforwards) -> driveRobotRelative(speeds), // Drive function
+            new PPHolonomicDriveController( // THIS is correct for swerve
+                new PIDConstants(5.0, 0.0, 0.0),   // Translation PID
+                new PIDConstants(5.0, 0.0, 0.0)    // Rotation PID
+            ),
+            config,   // PathPlanner robot config
             () -> {
                 var alliance = DriverStation.getAlliance();
                 return alliance.isPresent() && alliance.get() == DriverStation.Alliance.Red;
@@ -84,33 +85,9 @@ public class DriveSubsystem extends SubsystemBase {
             this
         );
     } else {
-        System.out.println("RobotConfig could not be loaded. AutoBuilder not configured.");
+        System.out.println("ERROR: RobotConfig failed to load; AutoBuilder disabled.");
     }
-    
 
-    // Usage reporting for MAXSwerve template
-    HAL.report(tResourceType.kResourceType_RobotDrive, tInstances.kRobotDriveSwerve_MaxSwerve);
-
-    AutoBuilder.configure(
-      this::getPose, // Robot pose supplier
-      this::resetOdometry, // Method to reset odometry (will be called if your auto has a starting pose)
-      this::getRobotRelativeSpeeds, // ChassisSpeeds supplier. MUST BE ROBOT RELATIVE
-      (speeds, feedforwards) -> driveRobotRelative(speeds), // Method that will drive the robot given ROBOT RELATIVE ChassisSpeeds. Also optionally outputs individual module feedforwards
-      new PPLTVController(0.02), // PPLTVController is the built in path following controller for differential drive trains
-      config, // The robot configuration
-      () -> {
-        // Boolean supplier that controls when the path will be mirrored for the red alliance
-        // This will flip the path being followed to the red side of the field.
-        // THE ORIGIN WILL REMAIN ON THE BLUE SIDE
-
-        var alliance = DriverStation.getAlliance();
-        if (alliance.isPresent()) {
-          return alliance.get() == DriverStation.Alliance.Red;
-        }
-        return false;
-      },
-      this // Reference to this subsystem to set requirements
-    );
   }
 
   @Override
